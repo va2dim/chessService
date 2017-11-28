@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Game;
+use App\Player;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class \PlayersController extends Controller
+class PlayersController
+  extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,18 +17,9 @@ class \PlayersController extends Controller
      */
     public function index()
     {
-        //
+        return Player::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -35,8 +29,11 @@ class \PlayersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $player = Player::create($request->all());
+
+        return response()->json($player, 201); // Объект создан
     }
+
 
     /**
      * Display the specified resource.
@@ -44,20 +41,67 @@ class \PlayersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+/*
     public function show($id)
     {
-        //
+        return Player::findOrFail($id);
+    }
+*/
+
+    public function show(Player $player)
+    {
+        return $player;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function showRating($id)
     {
-        //
+        $rating = Player::findOrFail($id)->rating;
+        return compact('rating');
+    }
+
+    public function showGames($id, Request $request)
+    {
+
+        /* // nested
+        $requestedEmbeds = explode(',', $request->input('embed', ''));
+
+        $possibleRelationships = [
+          'games' => 'games',
+          //'' => '',
+        ];
+        $eagerLoad = array_keys(array_intersect($possibleRelationships, $requestedEmbeds));
+*/
+
+        $player = Player::findOrFail($id);
+/*
+        var_dump($player);
+        die;
+*/
+        //$game = Game::findOrFail(1);
+
+        //var_dump($player->name);
+        //var_dump($player->games);
+
+
+        $games = $player->games;
+        //$games[] = $games->winner;
+        /*
+        var_dump($games);
+        die;
+*/
+
+
+
+        //$games = $player->with($eagerLoad)->get();
+        //return (new PlayersTransformer(Player::findOrFail($id), $embeds));
+
+
+
+        if (!empty($games)) {
+            return response()->json($games);
+        } else {
+            return response()->json(null, 204);
+        }
     }
 
     /**
@@ -69,8 +113,14 @@ class \PlayersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $player = Player::findOrFail($id);
+
+
+        $player->update($request->all());
+
+        return response()->json($player, 200); //OK
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -80,6 +130,9 @@ class \PlayersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $player = Player::findOrFail($id);
+        $player->delete();
+
+        return response()->json(null, 204); // Отсутствует контент (действие выполнено успешно, но возвращать нечего).
     }
 }

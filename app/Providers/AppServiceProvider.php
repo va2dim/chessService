@@ -15,6 +15,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191); // fix 4 artisan migrate
+
+        /*
+        $this->publishes([
+          base_path(__DIR__.'/../resources/assets/gamesLogs') => public_path('public/gamesLogs'),
+        ], 'public');
+        */
     }
 
     /**

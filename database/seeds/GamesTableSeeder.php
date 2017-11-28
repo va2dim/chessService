@@ -29,8 +29,9 @@ class GamesTableSeeder
             $minute = mt_rand(0, 60);
             $end_dt = \Carbon\Carbon::create($year, $month, $day, $hour, $minute, 0);
 
-            for($i=0; $i<2; $i++) {
-                $player_id[$i] = \App\Player::inRandomOrder()->first()->id; // TODO: выбрать случайно сразу пару, иначе может быть тотже игрок
+            $players = \App\Player::inRandomOrder()->limit(2)->get();
+            foreach ($players as $i => $player) {
+                $player_id[$i] = $player->id;
             }
 
             $game_id = DB::table('games')->insertGetId([
@@ -40,7 +41,7 @@ class GamesTableSeeder
             ]);
 
             for($i=0; $i<2; $i++) {
-                DB::table('games_to_players')->insert([
+                DB::table('game_player')->insert([
                   'game_id' => $game_id,
                   'player_id' => $player_id[$i]
                 ]);
